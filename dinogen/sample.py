@@ -8,14 +8,12 @@ def sample(parameters, char_to_ix, seed):
     Waa, Wax, Wya, by, b = parameters['Waa'], parameters['Wax'], parameters['Wya'], parameters['by'], parameters['b']
     vocab_size = by.shape[0]
     n_a = Waa.shape[1]
-
     # Step 1: Create the one-hot vector x for the first character (initializing the sequence generation).
     x = np.zeros((vocab_size, 1))
-    # Step 1': Initialize a_prev as zeros (≈1 line)
+    # Step 1': Initialize a_prev as zeros
     a_prev = np.zeros((n_a, 1))
 
-    # Create an empty list of indices, this is the list which will contain the list of indices of the characters to
-    # generate
+    # Create an empty list of indices, this list will contain the list of indices of the characters to generate
     indices = []
 
     # Idx is a flag to detect a newline character, we initialize it to -1
@@ -32,23 +30,17 @@ def sample(parameters, char_to_ix, seed):
         a = np.tanh(np.dot(Wax, x) + np.dot(Waa, a_prev) + b)
         z = np.dot(Wya, a) + by
         y = softmax(z)
-
         # for grading purposes
         np.random.seed(counter + seed)
-
         # Step 3: Sample the index of a character within the vocabulary from the probability distribution y
         idx = np.random.choice(list(range(vocab_size)), p=y.ravel())
-
         # Append the index to "indices"
         indices.append(idx)
-
         # Step 4: Overwrite the input character as the one corresponding to the sampled index.
         x = np.zeros((vocab_size, 1))
         x[idx] = 1
-
         # Update "a_prev" to be "a"
         a_prev = a
-
         # for grading purposes
         seed += 1
         counter += 1
