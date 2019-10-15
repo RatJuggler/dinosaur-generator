@@ -49,7 +49,7 @@ def model(sample_names, ix_to_char, char_to_ix, vocab_size, n_a=50, to_generate=
         Y = X[1:] + [char_to_ix["\n"]]
         # Perform one optimization step: Forward-prop -> Backward-prop -> Clip -> Update parameters
         # Choose a learning rate of 0.01
-        curr_loss, gradients, a_prev = optimize(X, Y, a_prev, parameters, learning_rate=0.01)
+        curr_loss, gradients, a_prev = optimize(X, Y, a_prev, parameters, vocab_size, learning_rate=0.01)
         # Use a latency trick to keep the loss smooth. It happens here to accelerate the training.
         loss = smooth(loss, curr_loss)
         # Every 2000 Iteration, generate "n" characters thanks to sample() to check if the model is learning properly

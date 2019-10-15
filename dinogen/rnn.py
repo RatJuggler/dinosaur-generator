@@ -23,7 +23,7 @@ def rnn_step_backward(dy, gradients, parameters, x, a, a_prev):
     return gradients
 
 
-def rnn_forward(X, Y, a0, parameters, vocab_size=27):
+def rnn_forward(X, Y, a0, parameters, vocab_size):
     # Initialize x, a and y_hat as empty dictionaries
     x, a, y_hat = {}, {}, {}
 
