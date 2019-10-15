@@ -16,51 +16,49 @@ def initialize_parameters(n_a, n_x, n_y):
 
 
 def get_initial_loss(vocab_size, seq_length):
-    return -np.log(1.0/vocab_size)*seq_length
+    return -np.log(1.0 / vocab_size) * seq_length
 
 
 def smooth(loss, cur_loss):
     return loss * 0.999 + cur_loss * 0.001
 
 
-def print_sample(sample_ix, ix_to_char):
-    txt = ''.join(ix_to_char[ix] for ix in sample_ix)
-    txt = txt[0].upper() + txt[1:]  # capitalize first character
-    print('%s' % (txt, ), end='')
+def print_samples(to_generate, parameters, char_to_index, index_to_char):
+    # The seed for the sample to print.
+    seed = 0
+    for name in range(to_generate):
+        # Sample indices and print them.
+        sampled_indices = sample(parameters, char_to_index, seed)
+        sampled_name = ''.join(index_to_char[i] for i in sampled_indices)
+        print(sampled_name.capitalize(), end='')
+        seed += 1  # To get the next sample increment the seed by one.
 
 
-def model(sample_names, ix_to_char, char_to_ix, vocab_size, n_a, to_generate, iterations):
-    # Retrieve n_x and n_y from vocab_size
+def model(training_names, index_to_char, char_to_index, vocab_size, n_a, to_generate, iterations):
+    # Set n_x and n_y to the vocab_size.
     n_x, n_y = vocab_size, vocab_size
-    # Initialize parameters
+    # Initialize parameters.
     parameters = initialize_parameters(n_a, n_x, n_y)
-    # Initialize loss (this is required because we want to smooth our loss, don't worry about it)
+    # Initialize loss (this is required because we want to smooth our loss).
     loss = get_initial_loss(vocab_size, to_generate)
-    # Shuffle list of sample names
+    # Shuffle the list of training names.
     np.random.seed(0)
-    np.random.shuffle(sample_names)
-    # Initialize the hidden state of your LSTM
+    np.random.shuffle(training_names)
+    # Initialize the hidden state of the LSTM.
     a_prev = np.zeros((n_a, 1))
-    # Optimization loop
+    # Optimization training loop.
     for j in range(iterations):
-        # Use the hint above to define one training example (X,Y)
-        index = j % len(sample_names)
-        X = [None] + [char_to_ix[ch] for ch in sample_names[index]]
-        Y = X[1:] + [char_to_ix["\n"]]
+        # Select the next name to use for training.
+        train_on = j % len(training_names)
+        X = [None] + [char_to_index[ch] for ch in training_names[train_on]]
+        Y = X[1:] + [char_to_index["\n"]]
         # Perform one optimization step: Forward-prop -> Backward-prop -> Clip -> Update parameters
         # Choose a learning rate of 0.01
-        curr_loss, gradients, a_prev = optimize(X, Y, a_prev, parameters, vocab_size, learning_rate=0.01)
+        curr_loss, gradients, a_prev = optimize(X, Y, a_prev, parameters, vocab_size, 0.01)
         # Use a latency trick to keep the loss smooth. It happens here to accelerate the training.
         loss = smooth(loss, curr_loss)
-        # Every 2000 Iteration, generate "n" samples to check if the model is learning properly
+        # Every 2000 Iteration, generate "n" samples to check if the model is learning properly.
         if j % 2000 == 0:
-            print('Iteration: %d, Loss: %f' % (j, loss) + '\n')
-            # The number of dinosaur names to print
-            seed = 0
-            for name in range(to_generate):
-                # Sample indices and print them
-                sampled_indices = sample(parameters, char_to_ix, seed)
-                print_sample(sampled_indices, ix_to_char)
-                seed += 1  # To get the same result for grading purposed, increment the seed by one.
-            print('\n')
+            print("Iteration: {0} - Loss: {1}".format(j, loss))
+            print_samples(to_generate, parameters, char_to_index, index_to_char)
     return parameters
