@@ -9,13 +9,13 @@ def sample(parameters, char_to_ix, seed):
     vocab_size = by.shape[0]
     n_a = Waa.shape[1]
 
-    # Step 1: Create the one-hot vector x for the first character (initializing the sequence generation). (≈1 line)
+    # Step 1: Create the one-hot vector x for the first character (initializing the sequence generation).
     x = np.zeros((vocab_size, 1))
     # Step 1': Initialize a_prev as zeros (≈1 line)
     a_prev = np.zeros((n_a, 1))
 
     # Create an empty list of indices, this is the list which will contain the list of indices of the characters to
-    # generate (≈1 line)
+    # generate
     indices = []
 
     # Idx is a flag to detect a newline character, we initialize it to -1

@@ -25,13 +25,13 @@ def update_parameters(parameters, gradients, lr):
     return parameters
 
 
-def optimize(X, Y, a_prev, parameters, vocab_size, learning_rate=0.01):
-    # Forward propagate through time (≈1 line)
+def optimize(X, Y, a_prev, parameters, vocab_size, learning_rate):
+    # Forward propagate through time
     loss, cache = rnn_forward(X, Y, a_prev, parameters, vocab_size)
-    # Backpropagate through time (≈1 line)
+    # Back-propagate through time
     gradients, a = rnn_backward(X, Y, parameters, cache)
-    # Clip your gradients between -5 (min) and 5 (max) (≈1 line)
+    # Clip your gradients between -5 (min) and 5 (max)
     gradients = clip(gradients, 5)
-    # Update parameters (≈1 line)
-    parameters = update_parameters(parameters, gradients, learning_rate)
+    # Update parameters
+    update_parameters(parameters, gradients, learning_rate)
     return loss, gradients, a[len(X) - 1]
