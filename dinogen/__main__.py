@@ -21,7 +21,7 @@ def generate():
     index_to_char = {i: ch for i, ch in enumerate(sorted(name_chars))}
     print(char_to_index)
     print(index_to_char)
-    model(sample_names, index_to_char, char_to_index, len(name_chars))
+    model(sample_names, index_to_char, char_to_index, len(name_chars), 50, 7, 40000)
 
 
 if __name__ == "__main__":

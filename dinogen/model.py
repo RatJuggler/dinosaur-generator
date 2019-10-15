@@ -29,7 +29,7 @@ def print_sample(sample_ix, ix_to_char):
     print('%s' % (txt, ), end='')
 
 
-def model(sample_names, ix_to_char, char_to_ix, vocab_size, n_a=50, to_generate=7, iterations=35000):
+def model(sample_names, ix_to_char, char_to_ix, vocab_size, n_a, to_generate, iterations):
     # Retrieve n_x and n_y from vocab_size
     n_x, n_y = vocab_size, vocab_size
     # Initialize parameters
@@ -43,7 +43,7 @@ def model(sample_names, ix_to_char, char_to_ix, vocab_size, n_a=50, to_generate=
     a_prev = np.zeros((n_a, 1))
     # Optimization loop
     for j in range(iterations):
-        # Use the hint above to define one training example (X,Y) (≈ 2 lines)
+        # Use the hint above to define one training example (X,Y)
         index = j % len(sample_names)
         X = [None] + [char_to_ix[ch] for ch in sample_names[index]]
         Y = X[1:] + [char_to_ix["\n"]]
@@ -52,7 +52,7 @@ def model(sample_names, ix_to_char, char_to_ix, vocab_size, n_a=50, to_generate=
         curr_loss, gradients, a_prev = optimize(X, Y, a_prev, parameters, vocab_size, learning_rate=0.01)
         # Use a latency trick to keep the loss smooth. It happens here to accelerate the training.
         loss = smooth(loss, curr_loss)
-        # Every 2000 Iteration, generate "n" characters thanks to sample() to check if the model is learning properly
+        # Every 2000 Iteration, generate "n" samples to check if the model is learning properly
         if j % 2000 == 0:
             print('Iteration: %d, Loss: %f' % (j, loss) + '\n')
             # The number of dinosaur names to print
