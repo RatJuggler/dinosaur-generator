@@ -19,22 +19,22 @@ def get_initial_loss(vocab_size, seq_length):
     return -np.log(1.0 / vocab_size) * seq_length
 
 
-def smooth(loss, cur_loss):
-    return loss * 0.999 + cur_loss * 0.001
+def smooth(loss, new_loss):
+    return loss * 0.999 + new_loss * 0.001
 
 
-def print_samples(to_generate, parameters, char_to_index, index_to_char):
+def print_samples(to_generate, parameters, vocab_to_index, index_to_vocab):
     # The seed for the sample to print.
     seed = 0
     for name in range(to_generate):
         # Sample indices and print them.
-        sampled_indices = sample(parameters, char_to_index, seed)
-        sampled_name = ''.join(index_to_char[i] for i in sampled_indices)
+        sampled_indices = sample(parameters, vocab_to_index['\n'], seed)
+        sampled_name = ''.join(index_to_vocab[i] for i in sampled_indices)
         print(sampled_name.capitalize(), end='')
         seed += 1  # To get the next sample increment the seed by one.
 
 
-def model(training_names, index_to_char, char_to_index, vocab_size, n_a, to_generate, iterations):
+def model(training_names, vocab_to_index, index_to_vocab, vocab_size, n_a, to_generate, iterations):
     # Set n_x and n_y to the vocab_size.
     n_x, n_y = vocab_size, vocab_size
     # Initialize parameters.
@@ -50,15 +50,17 @@ def model(training_names, index_to_char, char_to_index, vocab_size, n_a, to_gene
     for j in range(iterations):
         # Select the next name to use for training.
         train_on = j % len(training_names)
-        X = [None] + [char_to_index[ch] for ch in training_names[train_on]]
-        Y = X[1:] + [char_to_index["\n"]]
+        # Split the name into a vocabulary vector.
+        X = [None] + [vocab_to_index[ch] for ch in training_names[train_on]]
+        Y = X[1:] + [vocab_to_index["\n"]]
         # Perform one optimization step: Forward-prop -> Backward-prop -> Clip -> Update parameters
         # Choose a learning rate of 0.01
-        curr_loss, gradients, a_prev = optimize(X, Y, a_prev, parameters, vocab_size, 0.01)
+        new_loss, gradients, a_prev = optimize(X, Y, a_prev, parameters, vocab_size, 0.01)
         # Use a latency trick to keep the loss smooth. It happens here to accelerate the training.
-        loss = smooth(loss, curr_loss)
+        loss = smooth(loss, new_loss)
         # Every 2000 Iteration, generate "n" samples to check if the model is learning properly.
         if j % 2000 == 0:
             print("Iteration: {0} - Loss: {1}".format(j, loss))
-            print_samples(to_generate, parameters, char_to_index, index_to_char)
+            print_samples(to_generate, parameters, vocab_to_index, index_to_vocab)
+            print('\n')
     return parameters
