@@ -23,7 +23,7 @@ setup(
         ]
     },
     install_requires=[
-        'numpy == 1.17.2'
+        'numpy == 1.22.0'
     ],
     license='MIT',
 )
